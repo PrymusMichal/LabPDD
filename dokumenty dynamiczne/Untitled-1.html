@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <style>
+
+  </style>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="theme.blue.css">
+  </linkrel>
+  <script type="text/javascript" src="jquery-3.4.1.js"></script>
+  <script type="text/javascript" src="tablesorter-master/js/jquery.tablesorter.js"></script>
+  <script type="text/javascript" src="tablesorter-master/js/jquery.tablesorter.widgets.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+    crossorigin="anonymous"></script>
+
+  <script type="text/javascript" src="scripts/formValidate.js"></script>
+  <script type="text/javascript" src="scripts/changeSort.js"></script>
+  <script type="text/javascript" src="scripts/buttonFunctions.js"></script>
+  <script type="text/javascript" src="scripts/cart.js"></script>
+  <script type="text/javascript" src="scripts/jsonLoad.js"></script>
+  <script type="text/javascript" src="scripts/imageGallery.js"></script>
+  <script>
+    $(function () {
+      $("#myTable").tablesorter();
+    });
+    $('#exampleModal').on('shown.bs.modal', function () {
+      $('#exampleModal').trigger('focus')
+    })
+  </script>
+</head>
+
+<body style="background-color: rgba(174, 174, 199, 0.26);">
+  <div class="page-header" id="page-header">
+    <nav class="navbar navbar-expand bg-dark navbar-dark ">
+
+      <a class="navbar-brand" href="#home">Home </a>
+      <a class="navbar-brand" href="http://lcieszynski.zut.edu.pl/fileadmin/DPD/instrukcja_2019.pdf">Laboratoria </a>
+      <!-- Button trigger modal -->
+      <button onclick="addToCart()" type="button" class="btn btn-primary " data-toggle="modal"
+        data-target="#exampleModalCenter">
+        Koszyk
+      </button>
+
+      <!-- Modal -->
+      <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+        aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <table id="modalTable" class="tablesorter-blue">
+                <thead class="thead-dark">
+                  <tr>
+                    <th>Nazwa towaru</th>
+                    <th class="sorter-false">Cena Brutto</th>
+                    <th class="sorter-false">Liczba sztuk</th>
+                    <th class="sorter-false">Ilosc</th>
+                  </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+              </table>
+              Dostawa:
+              <select id="dostawa" onchange="setCena()">
+                <option value=0>Odbiór osobisty(0zł)</option>
+                <option value=15>Poczta(15zł)</option>
+                <option value=20>Kurier(20zł)</option>
+              </select>
+
+              <br>Cena:
+              <input type="number" id="cena" readonly>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary"
+                onclick="alert('Pomyslny zakup!');localStorage.removeItem('koszyk')" data-dismiss="modal">Kup</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </nav>
+  </div>
+  <div class="container-fluid bg-light">
+    <div class="row">
+      <div class="col-sm-12 col-lg-2 col-xl-3 text-center p-2">Lewa strona</div>
+      <div class="col-sm-12 col-lg-8 col-xl-6">
+        <div class="container-fluid mx-auto my-2">
+          <form class="addProduct" id="addProduct">
+            <div class="form-group" id="inputNameDiv">
+              <label for="inputName">Nazwa towaru</label>
+              <input type="text" class="form-control" onblur="validateFormInputName()" id="inputName"
+                placeholder="Enter name">
+              <div class="invalid-feedback">
+                Please choose a username.
+              </div>
+              <div class="valid-feedback">
+                Looks good!
+              </div>
+            </div>
+            <div class="form-group" id="inputIDDiv">
+              <label for="inputID" class="col-sm-4 col-form-label">ID</label>
+              <input type="name" class="form-control" onblur="validateFormInputID()" id="inputID"
+                placeholder="Enter ID">
+              <div class="invalid-feedback">
+                Please choose a username.
+              </div>
+            </div>
+            <div class="form-group" id="inputNettoDiv">
+              <label for="nettoValue" class="col-sm-4 col-form-label">netto value</label>
+              <input type="string" class="form-control" onblur="validateFormInputNettoValue()"
+                onchange="calculateBruttoValue()" id="inputNettoValue" placeholder="Enter netto value">
+              <div class="invalid-feedback">
+                Please choose a username.
+              </div>
+            </div>
+            <div class="form-group" id="inputVATDiv">
+              <label for="inputVAT" class="col-sm-4 col-form-label">VAT</label>
+              <input type="string" class="form-control " onblur="validateFormInputVAT()"
+                onchange="calculateBruttoValue()" id="inputVAT" placeholder="Enter VAT">
+              <div class="invalid-feedback">
+                Please choose a username.
+              </div>
+            </div>
+            <div class="form-group" id="inputBruttoDiv">
+              <label for="inputbrutto" class="col-sm-4 col-form-label">brutto value</label>
+              <input type="string" class="form-control " id="inputBruttoValue" placeholder="Enter brutto value">
+              <div class="invalid-feedback">
+                Please choose a username.
+              </div>
+            </div>
+
+            <fieldset class="form-group">
+              <div class="form-group" id="categoryDiv">
+                <div class="row">
+                  <legend class="col-form-label">Goods category</legend>
+                  <div class="col">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="gridCategory1" name="gridCategory"
+                        onchange="validateCategory()" value="1" checked>
+                      <label class="col-sm-4 col-form-label">
+                        First Category
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="gridCategory2" name="gridCategory"
+                        onchange="validateCategory()" value="2">
+                      <label class="col-sm-4 col-form-label">
+                        Second Category
+                      </label>
+                    </div>
+                    <div class="form-check ">
+                      <input class="form-check-input" type="radio" id="gridCategory3" name="gridCategory"
+                        onchange="validateCategory()" value="3">
+                      <label class="col-sm-4 col-form-label">
+                        Third Category
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </fieldset>
+
+            <fieldset class="form-group" required>
+              <div class="row" id="checkboxDiv">
+                <legend class="col-form-label">Goods options</legend>
+                <div class="col">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="1" id="goodsOptions1">
+                    <label class="col-sm-4 col-form-label" for="goodsOptions1">
+                      goodsOptions 1
+                    </label>
+
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="2" id="goodsOptions2">
+                    <label class="col-sm-4 col-form-label"" for="goodsOptions2">
+                      goodsOptions 2
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="3" id="goodsOptions3">
+                    <label class="col-sm-4 col-form-label" for="goodsOptions3">
+                      goodsOptions 3
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="4" id="goodsOptions4">
+                    <label class="col-sm-4 col-form-label" for="goodsOptions4">
+                      goodsOptions 4
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="5" id="goodsOptions5">
+                    <label class="col-sm-4 col-form-label" for="goodsOptions5">
+                      goodsOptions 5
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="invalid-feedback">
+                Please choose a username.
+              </div>
+            </fieldset>
+
+            <fieldset class="form-group" id="ratingDiv" required>
+              <legend class="col-form-label">Goods rating</legend>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="GoodsRating" id="GoodsRating1" value="1" checked>
+                <label class="col-sm-4 col-form-label" for="GoodsRating1">1</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="GoodsRating" id="GoodsRating2" value="2">
+                <label class="col-sm-4 col-form-label" for="GoodsRating2">2</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="GoodsRating" id="GoodsRating3" value="3">
+                <label class="col-sm-4 col-form-label" for="GoodsRating4">3 </label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="GoodsRating" id="GoodsRating4" value="4">
+                <label class="col-sm-4 col-form-label" for="GoodsRating4">4 </label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="GoodsRating" id="GoodsRating5" value="5">
+                <label class="col-sm-4 col-form-label" for="GoodsRating5">5 </label>
+              </div>
+              <div class="invalid-feedback">
+                Please choose a username.
+              </div>
+            </fieldset>
+            <div>
+              Dodaj plik:
+              <br>
+              <input class="col-sm-4 form-check-input" type="text">Dodaj plik</input>
+            </div>
+            <br>
+            <button id="submitButton" type="button" onclick="checkForm()" class="btn btn-primary">Submit</button>
+          </form>
+
+          <select id="sortowanie" onchange="changeSort()">
+            <option value="1">cena od najniższej</option>
+            <option value="2">cena od najwyższej</option>
+            <option value="3">ocena od najniższej</option>
+            <option value="4">ocena od najwyższej</option>
+            <option value="5">nazwa od A</option>
+            <option value="6">nazwa od Z</option>
+          </select>
+
+          <button id="LoadJSON" type="button" onclick="jsonLoad()" class="btn btn-primary">LoadJSON</button>
+
+          <select id="tableMode" onchange="showTable()">
+            <option value="1">lista</option>
+            <option value="2">obrazki</option>
+          </select>
+
+          <div
+              id="gallery"
+              class="container-fluid my-3"
+              hidden
+            ></div>
+
+          <div class="table-responsive" data-pattern="priority-columns">
+            <table id="myTable" class="tablesorter tablesorter-blue">
+              <thead class="thead-dark">
+                <tr>
+                  <th>Nazwa towaru</th>
+                  <th class="sorter-false">ID</th>
+                  <th class="sorter-false">netto value</th>
+                  <th class="sorter-false">VAT</th>
+                  <th>brutto value</th>
+                  <th class="sorter-false">Goods category</th>
+                  <th class="sorter-false">Goods options</th>
+                  <th>Goods rating</th>
+                  <th class="sorter-false">Usuń</th>
+                  <th class="sorter-false">Edytuj</th>
+                  <th class="sorter-false">Dodaj</th>
+                  <th class="sorter-false" hidden>Obrazek</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+
+
+        </div>
+      </div>
+      <div class="col-sm-12 col-lg-2 col-xl-3">
+        <div class="card mx-auto" style="max-width: 10rem;">
+            <div class="card-header">
+              lol
+            </div>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">Item1</li>
+              <li class="list-group-item">Item2</li>
+              <li class="list-group-item">Item3</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <footer class="footer">
+    <div class="container">
+      <span class="text-muted">Place sticky footer content here.</span>
+    </div>
+  </footer>
+
+
+</body>
+
+</html>
